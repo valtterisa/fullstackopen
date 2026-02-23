@@ -105,7 +105,7 @@ app.post("/api/persons", (req, res) => {
 if (process.env.NODE_ENV === "production") {
   const distPath = path.join(__dirname, "..", "frontend", "dist");
   app.use(express.static(distPath));
-  app.get("*", (req, res) => {
+  app.get("/{*path}", (req, res) => {
     if (req.path.startsWith("/api") || req.path === "/info") {
       return res.status(404).end();
     }
@@ -113,6 +113,6 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
   console.log(`Example app listening on port ${port}`);
 });
