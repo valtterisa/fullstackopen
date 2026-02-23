@@ -1,17 +1,23 @@
 {
   "name": "fullstackopen",
+  "private": true,
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node --watch index.js",
-    "start": "node index.js"
+    "dev": "concurrently \"pnpm -C backend dev\" \"pnpm -C frontend dev\"",
+    "dev:backend": "pnpm -C backend dev",
+    "dev:frontend": "pnpm -C frontend dev",
+    "build": "pnpm -C frontend build",
+    "start": "pnpm -C backend start",
+    "preview": "pnpm -C frontend preview",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "express": "^5.2.1",
-    "morgan": "^1.10.1"
-  }
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "packageManager": "pnpm@10.25.0"
 }

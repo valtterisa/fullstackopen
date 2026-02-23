@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
-const port = 3001;
+const path = require("path");
+const port = Number(process.env.PORT) || 3001;
+
 var morgan = require("morgan");
 
 app.use(express.json());
@@ -8,17 +10,12 @@ app.use(express.json());
 morgan.token("body", (req) => JSON.stringify(req.body));
 
 app.use(
-  morgan(
-    ":method :url :status :res[content-length] - :response-time ms :body",
-    {
-      skip: (req) => req.method !== "POST",
-    },
-  ),
+  morgan(":method :url :status :res[content-length] :response-time ms :body", {
+    skip: (req) => req.method !== "POST",
+  }),
 );
 
-app.use(
-  morgan(":method :url :status :res[content-length] - :response-time ms"),
-);
+app.use(morgan(":method :url :status :res[content-length] :response-time ms"));
 
 const data = [
   {
@@ -104,6 +101,17 @@ app.post("/api/persons", (req, res) => {
 
   res.json(person);
 });
+
+if (process.env.NODE_ENV === "production") {
+  const distPath = path.join(__dirname, "..", "frontend", "dist");
+  app.use(express.static(distPath));
+  app.get("*", (req, res) => {
+    if (req.path.startsWith("/api") || req.path === "/info") {
+      return res.status(404).end();
+    }
+    res.sendFile(path.join(distPath, "index.html"));
+  });
+}
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
