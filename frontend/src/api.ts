@@ -38,3 +38,22 @@ export async function deletePerson(id: number): Promise<void> {
     throw new Error("Failed to delete person");
   }
 }
+
+export async function updateNumber(input: Person): Promise<Person> {
+  const res = await fetch(baseUrl, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
+  });
+
+  if (!res.ok) {
+    const data = (await res.json().catch(() => null)) as {
+      error?: string;
+    } | null;
+    throw new Error(data?.error ?? "Failed to update person");
+  }
+
+  return res.json();
+}

@@ -41,10 +41,24 @@ async function createPerson(req, res) {
   res.json(person);
 }
 
+async function updateNumber(req, res) {
+  const { id, number } = req.body;
+
+  if (!id || !number) {
+    return res
+      .status(400)
+      .json(!id ? { error: "id missing" } : { error: "number missing" });
+  }
+
+  const person = await personModel.updateNumber(id, number);
+  res.json(person);
+}
+
 module.exports = {
   getInfo,
   getAllPersons,
   getPersonById,
   deletePerson,
   createPerson,
+  updateNumber
 };

@@ -61,6 +61,16 @@ async function createPerson(name, number) {
   return person;
 }
 
+async function updateNumber(id, number) {
+  const person = await Person.findOneAndUpdate(
+    { id: id },
+    { number: number },
+    { new: true },
+  );
+
+  return person;
+}
+
 module.exports = {
   getAll,
   getCount,
@@ -68,4 +78,5 @@ module.exports = {
   removeById,
   nameExists,
   createPerson,
+  updateNumber
 };

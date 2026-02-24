@@ -1,5 +1,5 @@
 import { type SubmitEvent, useEffect, useState } from "react";
-import { createPerson, deletePerson, fetchPersons } from "./api.ts";
+import { createPerson, deletePerson, fetchPersons, updateNumber } from "./api.ts";
 import type { Person } from "./types.ts";
 import "./App.css";
 
@@ -89,6 +89,51 @@ function App() {
       });
   }
 
+  function handleEdit(person: Person) {
+    const newNumber = window.prompt(
+      `Edit number for ${person.name}`,
+      person.number,
+    );
+
+    if (newNumber === null) {
+      return;
+    }
+
+    const trimmedNumber = newNumber.trim();
+
+    if (!trimmedNumber) {
+      setNotification({
+        type: "error",
+        message: "Number cannot be empty.",
+      });
+      return;
+    }
+
+    setStatus("loading");
+    updateNumber({ ...person, number: trimmedNumber })
+      .then((updated) => {
+        if (!updated) {
+          throw new Error("Person not found");
+        }
+        setPersons((prev) =>
+          prev.map((p) => (p.id === updated.id ? updated : p)),
+        );
+        setNotification({
+          type: "success",
+          message: `Updated ${person.name} and number ${trimmedNumber}.`,
+        });
+      })
+      .catch(() => {
+        setNotification({
+          type: "error",
+          message: "Failed to update contact.",
+        });
+      })
+      .finally(() => {
+        setStatus("idle");
+      });
+  }
+
   function clearNotification() {
     setNotification(null);
   }
@@ -162,6 +207,14 @@ function App() {
                   disabled={status === "loading"}
                 >
                   Delete
+                </button>
+                <button
+                  type="button"
+                  className="ghost-button"
+                  onClick={() => handleEdit(person)}
+                  disabled={status === "loading"}
+                >
+                  Edit
                 </button>
               </li>
             ))}

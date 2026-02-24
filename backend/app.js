@@ -1,23 +1,18 @@
 const express = require("express");
 const path = require("path");
-const morgan = require("morgan");
+const middleware = require("./utils/middleware")
+const logger = require("./utils/logger")
 const personRoutes = require("./routes/personRoutes");
+const { connectMongo } = require("./db/mongo");
 
 const app = express();
 
-app.use(express.json());
-
-morgan.token("body", (req) => JSON.stringify(req.body));
-
-app.use(
-  morgan(":method :url :status :res[content-length] :response-time ms :body", {
-    skip: (req) => req.method !== "POST",
-  }),
-);
-
-app.use(morgan(":method :url :status :res[content-length] :response-time ms"));
-
-app.use(personRoutes);
+connectMongo().then(() => {
+  logger.info('connected to MongoDB')
+})
+.catch((error) => {
+  logger.error('error connection to MongoDB:', error.message)
+})
 
 if (process.env.NODE_ENV === "production") {
   const distPath = path.join(__dirname, "..", "frontend", "dist");
@@ -29,6 +24,14 @@ if (process.env.NODE_ENV === "production") {
     res.sendFile(path.join(distPath, "index.html"));
   });
 }
+
+app.use(express.json());
+app.use(middleware.requestLogger);
+
+app.use(personRoutes);
+
+app.use(middleware.unknownEndpoint)
+app.use(middleware.errorHandler)
 
 module.exports = app;
 
