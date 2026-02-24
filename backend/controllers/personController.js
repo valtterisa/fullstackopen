@@ -44,7 +44,7 @@ async function createPerson(req, res) {
 async function updateNumber(req, res) {
   const { id, number } = req.body;
 
-  if (!id || !number) {
+  if (id === undefined || id === null || !number) {
     return res
       .status(400)
       .json(!id ? { error: "id missing" } : { error: "number missing" });

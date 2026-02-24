@@ -7,7 +7,8 @@ const personSchema = new mongoose.Schema({
   number: String,
 });
 
-const Person = mongoose.model("Person", personSchema);
+const Person =
+  mongoose.models.Person || mongoose.model("Person", personSchema);
 
 async function getAll() {
   return await Person.find({}).then((persons) => {
@@ -20,17 +21,12 @@ async function getCount() {
 }
 
 async function findById(id) {
-  return await Person.findById(id);
+  return await Person.findOne({ id });
 }
 
 async function removeById(id) {
-  await Person.deleteOne({ id: id })
-    .then(() => {
-      return true;
-    })
-    .catch((error) => {
-      return error;
-    });
+  const result = await Person.deleteOne({ id });
+  return result.deletedCount > 0;
 }
 
 async function nameExists(name) {

@@ -3,12 +3,11 @@ import supertest from "supertest";
 
 import * as db from "./database";
 const app = require("../app");
-const { connectMongo } = require("../db/mongo");
 
 let request;
 
 beforeAll(async () => {
-  await connectMongo();
+  await db.connect();
   request = supertest(app);
 });
 
