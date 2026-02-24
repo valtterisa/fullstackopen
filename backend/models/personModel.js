@@ -1,60 +1,63 @@
 const { generateId } = require("../utils/id");
+const mongoose = require("mongoose");
 
-const persons = [
-  {
-    id: 1,
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: 2,
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: 3,
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: 4,
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
+const personSchema = new mongoose.Schema({
+  id: Number,
+  name: String,
+  number: String,
+});
 
-function getAll() {
-  return persons;
+const Person = mongoose.model("Person", personSchema);
+
+async function getAll() {
+  return await Person.find({}).then((persons) => {
+    return persons;
+  });
 }
 
-function getCount() {
-  return persons.length;
+async function getCount() {
+  return await Person.countDocuments({});
 }
 
-function findById(id) {
-  return persons.find((person) => person.id === id) || null;
+async function findById(id) {
+  return await Person.findById(id);
 }
 
-function removeById(id) {
-  const index = persons.findIndex((person) => person.id === id);
-  if (index === -1) {
-    return false;
+async function removeById(id) {
+  await Person.deleteOne({ id: id })
+    .then(() => {
+      return true;
+    })
+    .catch((error) => {
+      return error;
+    });
+}
+
+async function nameExists(name) {
+  return await Person.findOne({ name: name });
+}
+
+async function createPerson(name, number) {
+  if (await nameExists(name)) {
+    console.log("Name already exists:", name);
+    return { error: "name must be unique" };
   }
-  persons.splice(index, 1);
-  return true;
-}
 
-function nameExists(name) {
-  return Boolean(persons.find((person) => person.name === name));
-}
-
-function createPerson(name, number) {
-  const person = {
+  const person = new Person({
     id: generateId(),
-    name,
-    number,
-  };
-  persons.push(person);
+    name: name,
+    number: number,
+  });
+
+  await person
+    .save()
+    .then(() => {
+      console.log("Person saved to MongoDB:", person);
+    })
+    .catch((error) => {
+      console.error("Error saving person to MongoDB:", error);
+    });
+
   return person;
 }
 
@@ -66,4 +69,3 @@ module.exports = {
   nameExists,
   createPerson,
 };
-
