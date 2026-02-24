@@ -11,12 +11,13 @@
     "build": "pnpm -C frontend build",
     "start": "pnpm -C backend start",
     "preview": "pnpm -C frontend preview",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test:e2e": "playwright test"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "concurrently": "^9.1.2"
   },
   "packageManager": "pnpm@10.25.0"

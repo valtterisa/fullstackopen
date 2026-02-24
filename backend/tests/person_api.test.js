@@ -1,17 +1,11 @@
-const { test, after } = require("node:test");
-const mongoose = require("mongoose");
-const supertest = require("supertest");
-const app = require("../app");
+import { describe, it, expect, afterAll } from "vitest";
+import { request } from "./setup";
 
-const api = supertest(app);
-
-test("notes are returned as json", async () => {
-  await api
-    .get("/api/notes")
-    .expect(200)
-    .expect("Content-Type", /application\/json/);
-});
-
-after(async () => {
-  await mongoose.connection.close();
+describe("persons API", () => {
+  it("returns JSON", async () => {
+    await request
+      .get("/api/persons")
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+  });
 });
