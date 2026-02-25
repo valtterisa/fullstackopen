@@ -1,0 +1,48 @@
+FROM mongo:7.0
+
+ENV MONGO_INITDB_DATABASE=phonebook_e2e
+
+RUN mkdir -p /docker-entrypoint-initdb.d \
+  && printf "%s\n" \
+  "db = db.getSiblingDB('phonebook_e2e');" \
+  "db.users.drop();" \
+  "db.users.insertMany([" \
+  "  {" \
+  "    name: 'Alice Tester'," \
+  "    email: 'alice@example.com'," \
+  "    role: 'admin'," \
+  "    createdAt: new Date('2024-01-01T00:00:00Z')" \
+  "  }," \
+  "  {" \
+  "    name: 'Bob Tester'," \
+  "    email: 'bob@example.com'," \
+  "    role: 'user'," \
+  "    createdAt: new Date('2024-02-01T00:00:00Z')" \
+  "  }," \
+  "  {" \
+  "    name: 'Charlie QA'," \
+  "    email: 'charlie@example.com'," \
+  "    role: 'user'," \
+  "    createdAt: new Date('2024-03-01T00:00:00Z')" \
+  "  }" \
+  "]);" \
+  "db.sessions.drop();" \
+  "db.sessions.insertMany([" \
+  "  {" \
+  "    userEmail: 'alice@example.com'," \
+  "    token: 'alice-session-token'," \
+  "    createdAt: new Date('2024-04-01T00:00:00Z')," \
+  "    expiresAt: new Date('2099-01-01T00:00:00Z')" \
+  "  }," \
+  "  {" \
+  "    userEmail: 'bob@example.com'," \
+  "    token: 'bob-session-token'," \
+  "    createdAt: new Date('2024-04-02T00:00:00Z')," \
+  "    expiresAt: new Date('2099-01-01T00:00:00Z')" \
+  "  }" \
+  "]);" \
+  > /docker-entrypoint-initdb.d/seed.js
+
+EXPOSE 27017
+
+# Start with the default MongoDB entrypoint/cmd
